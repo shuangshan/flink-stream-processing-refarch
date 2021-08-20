@@ -214,7 +214,7 @@ Resources:
   KinesisStream:
     Type: AWS::Kinesis::Stream
     Properties:
-      ShardCount: 32
+      ShardCount: 2
 
   ElasticSearch:
     Type: AWS::Elasticsearch::Domain
@@ -248,7 +248,7 @@ Resources:
             ]
           }
       ElasticsearchClusterConfig:
-        InstanceCount: 2
+        InstanceCount: 1
         InstanceType: m3.medium.elasticsearch
         ZoneAwarenessEnabled: true
       ElasticsearchVersion: 5.5
@@ -270,7 +270,7 @@ Resources:
           Market: ON_DEMAND
           Name: Master
         CoreInstanceGroup:
-          InstanceCount: 2
+          InstanceCount: 1
           InstanceType: c4.large
           Market: ON_DEMAND
           Name: Core
@@ -346,10 +346,10 @@ Resources:
 
             aws cloudformation wait stack-create-complete --stack-name '${AWS::StackName}' --region ${AWS::Region}
 
-            curl -s https://raw.githubusercontent.com/awslabs/flink-stream-processing-refarch/master/elasticsearch/es-index.json | curl -s -XPUT https://${ElasticSearch.DomainEndpoint}/taxi-dashboard -d @-
+            curl -s https://raw.githubusercontent.com/shuangshan/flink-stream-processing-refarch/master/elasticsearch/es-index.json | curl -s -XPUT https://${ElasticSearch.DomainEndpoint}/taxi-dashboard -d @-
             curl -s -XPUT https://${ElasticSearch.DomainEndpoint}/.kibana/index-pattern/taxi-dashboard -d '{"title" : "taxi-dashboard",  "timeFieldName": "timestamp"}'
             curl -s -XPUT https://${ElasticSearch.DomainEndpoint}/.kibana/config/5.5.0 -d '{"defaultIndex" : "taxi-dashboard"}'
-            curl -s https://raw.githubusercontent.com/awslabs/flink-stream-processing-refarch/master/elasticsearch/kibana-visualizations-and-dashboard.json | jq -rc '.[]' | while read -r item; do jq -rn "$item | ._source" | curl -s -XPUT https://${ElasticSearch.DomainEndpoint}/.kibana/$(jq -rn "$item | [._type,._id] | join(\"/\")") -d @-; done
+            curl -s https://raw.githubusercontent.com/shuangshan/flink-stream-processing-refarch/master/elasticsearch/kibana-visualizations-and-dashboard.json | jq -rc '.[]' | while read -r item; do jq -rn "$item | ._source" | curl -s -XPUT https://${ElasticSearch.DomainEndpoint}/.kibana/$(jq -rn "$item | [._type,._id] | join(\"/\")") -d @-; done
 
 
   FlinkNotProcessingFromKinesisAlarm:
